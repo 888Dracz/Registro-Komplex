@@ -7,7 +7,7 @@
 <style>
 * { box-sizing: border-box; }
 body {
-  margin: 0; background: #111; color: #1a1a1a;
+  margin: 0; -webkit-text-size-adjust: 100%; background: #111; color: #1a1a1a;
   font-family: "Segoe UI", Tahoma, Arial, sans-serif; font-size: 14px;
 }
 input, textarea, select, button { font-family: inherit; font-size: inherit; color: inherit; }
@@ -148,6 +148,66 @@ td input:focus { border-color: #d40000; background: #fff; outline: 0; }
 .irarea { color: #d40000; cursor: pointer; }
 .irarea:hover { text-decoration: underline; }
 
+
+/* ---------- MOVIL ---------- */
+#bMenu { display: none; }
+@media (max-width: 720px) {
+  body { font-size: 15px; }
+  #app { display: block; }
+  #nav {
+    display: none; width: auto; min-width: 0;
+    border-right: 0; border-bottom: 3px solid #d40000; padding-bottom: 10px;
+  }
+  #nav.abierto { display: block; }
+  #bMenu { display: inline-block; margin: 0 8px 0 0; }
+
+  #bar { padding: 8px 12px; }
+  #bar .right { float: none; display: block; margin-top: 8px; }
+  .btn { padding: 7px 10px; margin: 0 5px 5px 0; }
+
+  #page { padding: 16px 14px 60px; }
+  h1.title, h1.title input { font-size: 22px; }
+  .sub { margin-bottom: 16px; }
+
+  .bloque { padding: 12px 14px; }
+  .bloque p { text-align: left; }
+  .bloque textarea { font-size: 16px; }
+  .bloque h3, .bloque h3 input { font-size: 16px; }
+  .thumb { width: 100%; margin-right: 0; }
+
+  .filtros { padding: 12px 14px 4px; }
+  .filtros label { display: block; width: 100%; margin-right: 0; }
+  .filtros select, .filtros input {
+    width: 100%; min-width: 0; max-width: none; font-size: 16px;
+  }
+  .filtros .btn { width: 100%; margin: 4px 0 10px; }
+
+  .tablahead .right { float: none; display: block; margin-top: 8px; }
+  .tablahead input.filtro { width: 100%; font-size: 16px; }
+
+  /* cada fila pasa a ser una ficha */
+  .tablabox { overflow-x: visible; }
+  .tablabox table, .tablabox tbody, .tablabox tr, .tablabox td { display: block; width: auto; }
+  .tablabox tr.cab { display: none; }
+  .tablabox tr {
+    border: 1px solid #e5e5e5; border-left: 3px solid #d40000;
+    padding: 7px 11px; margin: 0 0 8px;
+  }
+  .tablabox tr:hover td, .tablabox td { background: none; border-bottom: 0; }
+  .tablabox td { padding: 2px 0; }
+  .tablabox td:empty { display: none; }
+  .tablabox td:before {
+    content: attr(data-t); display: block;
+    color: #aaa; font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .tablabox td input { font-size: 16px; border: 1px solid #ddd; }
+  .tablabox tr.grupo { border: 0; padding: 0; margin: 18px 0 8px; }
+  .tablabox tr.grupo td { padding: 0; background: none; }
+  .tablabox tr.grupo td:before { content: none; }
+  .tablabox .delrow { font-size: 20px; }
+  .leyenda .badge { margin-left: 4px; }
+}
+
 /* ---------- IMPRESION ---------- */
 @media print {
   #nav, #bar, .bloquebar, .delrow, .navadd, .tablahead .right, .filtros .btn { display: none !important; }
@@ -163,6 +223,7 @@ td input:focus { border-color: #d40000; background: #fff; outline: 0; }
   <aside id="nav"></aside>
   <div id="main">
     <div id="bar">
+      <button class="btn" id="bMenu">&#9776; Secciones</button>
       <span id="estado">Listo</span>
       <span class="right">
         <button class="btn red" id="bEdit">Modo edición</button>
@@ -401,15 +462,18 @@ function renderResultados() {
   if (!res.length) {
     return h + '<div class="vacio">Ning\u00fan \u00edtem coincide con la selecci\u00f3n.</div>';
   }
-  h += '<div class="tablabox"><table><tr><th>\u00c1rea</th><th>Categor\u00eda</th>' +
+  h += '<div class="tablabox"><table><tr class="cab"><th>\u00c1rea</th><th>Categor\u00eda</th>' +
     '<th>\u00cdtem / Elemento</th><th>Cantidad</th><th>Estado</th><th>Observaci\u00f3n</th></tr>';
   for (i = 0; i < res.length; i++) {
     f = res[i][2];
-    h += '<tr><td><span class="irarea" data-a="irarea" data-i="' + res[i][0] + '">' + esc(res[i][1]) + '</span></td>';
-    h += '<td>' + esc(f[1]) + '</td><td>' + esc(f[2]) + '</td><td>' + esc(f[3]) + '</td>';
-    h += '<td>' + (f[4] ? '<span class="badge e-' + esc(String(f[4]).toUpperCase().charAt(0)) + '">' +
-      esc(f[4]) + '</span>' : '') + '</td>';
-    h += '<td>' + esc(f[5]) + '</td></tr>';
+    h += '<tr><td data-t="\u00c1rea"><span class="irarea" data-a="irarea" data-i="' + res[i][0] + '">' +
+      esc(res[i][1]) + '</span></td>';
+    h += '<td data-t="Categor\u00eda">' + esc(f[1]) + '</td>' +
+      '<td data-t="\u00cdtem / Elemento">' + esc(f[2]) + '</td>' +
+      '<td data-t="Cantidad">' + esc(f[3]) + '</td>';
+    h += '<td data-t="Estado">' + (f[4] ? '<span class="badge e-' +
+      esc(String(f[4]).toUpperCase().charAt(0)) + '">' + esc(f[4]) + '</span>' : '') + '</td>';
+    h += '<td data-t="Observaci\u00f3n">' + esc(f[5]) + '</td></tr>';
   }
   return h + '</table></div>';
 }
@@ -469,12 +533,12 @@ function renderTabla() {
   }
 
   var salta = (p.agrupa && !edit) ? 1 : 0;
-  h += '<table><tr>';
+  h += '<table><tr class="cab">';
   for (j = salta; j < p.cols.length; j++) { h += '<th>' + esc(p.cols[j]) + '</th>'; }
   if (edit) { h += '<th style="width:22px"></th>'; }
   h += '</tr>';
 
-  var vistos = 0, grupo = null, f, v;
+  var vistos = 0, grupo = null, f, v, et;
   for (i = 0; i < p.filas.length; i++) {
     f = p.filas[i];
     if (q && f.join(' ').toLowerCase().indexOf(q) < 0) continue;
@@ -486,12 +550,13 @@ function renderTabla() {
     h += '<tr>';
     for (j = salta; j < p.cols.length; j++) {
       v = f[j] == null ? '' : f[j];
+      et = ' data-t="' + esc(p.cols[j]) + '"';
       if (edit) {
-        h += '<td><input data-f="cel:' + i + ':' + j + '" value="' + esc(v) + '"></td>';
+        h += '<td' + et + '><input data-f="cel:' + i + ':' + j + '" value="' + esc(v) + '"></td>';
       } else if (p.grupo === 'inv' && j === 4 && v) {
-        h += '<td><span class="badge e-' + esc(String(v).toUpperCase().charAt(0)) + '">' + esc(v) + '</span></td>';
+        h += '<td' + et + '><span class="badge e-' + esc(String(v).toUpperCase().charAt(0)) + '">' + esc(v) + '</span></td>';
       } else {
-        h += '<td>' + esc(v) + '</td>';
+        h += '<td' + et + '>' + esc(v) + '</td>';
       }
     }
     if (edit) { h += '<td><span class="delrow" data-a="delfila" data-i="' + i + '">&times;</span></td>'; }
@@ -566,9 +631,9 @@ function onClick(ev) {
   var p = pag();
 
   if (a === 'ir') {
-    cur = i; filtro = navq; render(); window.scrollTo(0, 0);
+    cur = i; filtro = navq; $('nav').className = ''; render(); window.scrollTo(0, 0);
   } else if (a === 'irarea') {
-    cur = i; filtro = bq.txt; render(); window.scrollTo(0, 0);
+    cur = i; filtro = bq.txt; $('nav').className = ''; render(); window.scrollTo(0, 0);
   } else if (a === 'limpiar') {
     bq = { area: '', cat: '', est: '', txt: '' }; renderPage();
   } else if (a === 'nuevapag') {
@@ -684,6 +749,10 @@ $('bEdit').onclick = function () {
   this.innerHTML = edit ? 'Terminar edición' : 'Modo edición';
   this.className = edit ? 'btn' : 'btn red';
   renderPage();
+};
+$('bMenu').onclick = function () {
+  var n = $('nav');
+  n.className = n.className.indexOf('abierto') >= 0 ? '' : 'abierto';
 };
 $('bExport').onclick = exportar;
 $('bImport').onclick = function () { $('fileJson').value = ''; $('fileJson').click(); };
