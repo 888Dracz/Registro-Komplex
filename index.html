@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Komplex Gym — Registro</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: #111; color: #1a1a1a;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif; font-size: 14px;
+}
+input, textarea, select, button { font-family: inherit; font-size: inherit; color: inherit; }
+
+/* ---------- LAYOUT ---------- */
+#app { display: flex; min-height: 100vh; }
+#nav {
+  width: 230px; min-width: 230px; background: #0d0d0d; color: #ddd;
+  border-right: 3px solid #d40000; padding-bottom: 40px;
+}
+#main { flex: 1; background: #fff; min-width: 0; }
+
+/* ---------- NAV ---------- */
+.brand { padding: 18px 16px 14px; border-bottom: 1px solid #262626; }
+.brand b { color: #fff; font-size: 20px; letter-spacing: 3px; display: block; }
+.brand span { color: #d40000; font-size: 11px; letter-spacing: 2px; }
+.navsearch { padding: 10px 12px; }
+.navsearch input {
+  width: 100%; padding: 6px 8px; background: #1c1c1c; color: #fff;
+  border: 1px solid #333; border-radius: 3px;
+}
+.navgroup {
+  padding: 14px 16px 4px; color: #777; font-size: 10px;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+.navitem {
+  display: block; padding: 7px 16px; color: #ccc; cursor: pointer;
+  border-left: 3px solid transparent; text-decoration: none;
+}
+.navitem:hover { background: #1a1a1a; color: #fff; }
+.navitem.on { background: #1a1a1a; color: #fff; border-left-color: #d40000; font-weight: bold; }
+.navitem .n { float: right; color: #666; font-size: 11px; font-weight: normal; }
+.navadd { color: #d40000; font-size: 12px; padding: 6px 16px; cursor: pointer; }
+.navadd:hover { text-decoration: underline; }
+
+/* ---------- TOOLBAR ---------- */
+#bar {
+  background: #1a1a1a; color: #fff; padding: 8px 22px;
+  border-bottom: 3px solid #d40000; overflow: hidden;
+}
+#bar .right { float: right; }
+.btn {
+  background: #2b2b2b; color: #eee; border: 1px solid #444; padding: 5px 11px;
+  border-radius: 3px; cursor: pointer; margin-left: 5px;
+}
+.btn:hover { background: #3a3a3a; }
+.btn.red { background: #d40000; border-color: #d40000; color: #fff; font-weight: bold; }
+.btn.red:hover { background: #b00000; }
+#estado { font-size: 12px; color: #8a8a8a; padding: 6px 0; display: inline-block; }
+
+/* ---------- PAGE ---------- */
+#page { padding: 24px 30px 80px; max-width: 1100px; }
+h1.title { font-size: 27px; margin: 0 0 3px; color: #111; }
+h1.title input {
+  font-size: 27px; font-weight: bold; border: 0; border-bottom: 2px dashed #ccc;
+  width: 100%; padding: 0 0 3px;
+}
+.sub { color: #888; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 22px; }
+.sub b { color: #d40000; }
+
+/* ---------- BLOQUES ---------- */
+.bloque { border: 1px solid #e2e2e2; border-left: 4px solid #d40000; padding: 14px 18px; margin-bottom: 16px; }
+.bloque h3 { margin: 0 0 8px; font-size: 17px; color: #111; }
+.bloque h3 input { font-size: 17px; font-weight: bold; width: 100%; border: 0; border-bottom: 1px dashed #ccc; padding: 2px 0; }
+.bloque p { margin: 0 0 9px; line-height: 1.62; text-align: justify; white-space: pre-wrap; }
+.bloque textarea {
+  width: 100%; min-height: 90px; padding: 9px; border: 1px solid #ddd;
+  line-height: 1.6; resize: vertical;
+}
+.bloquebar { margin-top: 8px; padding-top: 8px; border-top: 1px dotted #ddd; }
+.bloquebar .btn { background: #eee; color: #333; border-color: #ddd; font-size: 12px; margin: 0 4px 0 0; }
+.bloquebar .btn:hover { background: #ddd; }
+
+/* ---------- IMAGENES ---------- */
+.imgs { margin: 10px 0 0; }
+.thumb { display: inline-block; vertical-align: top; width: 210px; margin: 0 12px 12px 0; }
+.thumb img { width: 100%; border: 1px solid #ddd; cursor: pointer; display: block; }
+.thumb .pie { font-size: 11px; color: #666; padding: 4px 2px; text-align: center; }
+.thumb .pie input { width: 100%; border: 0; border-bottom: 1px dashed #ccc; text-align: center; font-size: 11px; }
+.thumb .del { color: #d40000; font-size: 11px; cursor: pointer; text-align: center; display: block; }
+#lightbox {
+  display: none; position: fixed; z-index: 99; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,.9); text-align: center; cursor: zoom-out;
+}
+#lightbox img { max-width: 94%; max-height: 90%; margin-top: 3%; border: 2px solid #d40000; }
+
+/* ---------- TABLA ---------- */
+.tablabox { margin-top: 26px; overflow-x: auto; }
+.tablahead { border-bottom: 3px solid #111; padding-bottom: 6px; margin-bottom: 0; overflow: hidden; }
+.tablahead h2 { display: inline-block; margin: 0; font-size: 15px; letter-spacing: 2px; text-transform: uppercase; }
+.tablahead .right { float: right; }
+.tablahead input.filtro { padding: 5px 8px; border: 1px solid #ccc; width: 200px; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  background: #111; color: #fff; text-align: left; padding: 7px 9px;
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: normal;
+}
+td { padding: 6px 9px; border-bottom: 1px solid #eee; vertical-align: top; }
+tr.grupo td {
+  background: #f4f4f4; font-weight: bold; font-size: 11px; letter-spacing: 2px;
+  text-transform: uppercase; color: #d40000; border-bottom: 1px solid #ddd;
+}
+tr:hover td { background: #fbfbfb; }
+tr.grupo:hover td { background: #f4f4f4; }
+td input { width: 100%; border: 1px solid transparent; padding: 3px 4px; background: transparent; }
+td input:focus { border-color: #d40000; background: #fff; outline: 0; }
+.badge {
+  display: inline-block; min-width: 20px; text-align: center; padding: 1px 6px;
+  border-radius: 2px; font-weight: bold; font-size: 12px;
+}
+.e-A { background: #eee; color: #222; border: 1px solid #ccc; }
+.e-B { background: #333; color: #fff; }
+.e-C { background: #fff; color: #d40000; border: 1px solid #d40000; }
+.e-D { background: #d40000; color: #fff; }
+.delrow { color: #ccc; cursor: pointer; font-weight: bold; }
+.delrow:hover { color: #d40000; }
+.leyenda { margin-top: 10px; font-size: 11px; color: #777; }
+.leyenda .badge { margin: 0 3px 0 12px; }
+.resumen { margin: 0 0 14px; font-size: 12px; color: #555; }
+.resumen b { color: #111; }
+.vacio { padding: 26px; text-align: center; color: #999; border: 1px dashed #ddd; }
+
+/* ---------- BUSCADOR ---------- */
+.filtros {
+  background: #f7f7f7; border: 1px solid #e2e2e2; border-left: 4px solid #d40000;
+  padding: 14px 18px 6px; margin-bottom: 18px;
+}
+.filtros label {
+  display: inline-block; vertical-align: top; margin: 0 18px 10px 0;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #777;
+}
+.filtros select, .filtros input {
+  display: block; margin-top: 4px; padding: 6px 7px; border: 1px solid #ccc;
+  background: #fff; color: #111; font-size: 14px; min-width: 185px; max-width: 260px;
+}
+.filtros .btn { background: #eee; color: #333; border-color: #ddd; margin: 20px 0 0; }
+.cnt { color: #d40000; font-size: 16px; }
+.irarea { color: #d40000; cursor: pointer; }
+.irarea:hover { text-decoration: underline; }
+
+/* ---------- IMPRESION ---------- */
+@media print {
+  #nav, #bar, .bloquebar, .delrow, .navadd, .tablahead .right, .filtros .btn { display: none !important; }
+  body, #main { background: #fff; }
+  #page { padding: 0; max-width: none; }
+  .bloque { border-color: #999; page-break-inside: avoid; }
+  th { background: #000 !important; -webkit-print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="nav"></aside>
+  <div id="main">
+    <div id="bar">
+      <span id="estado">Listo</span>
+      <span class="right">
+        <button class="btn red" id="bEdit">Modo edición</button>
+        <button class="btn" id="bExport">Respaldo</button>
+        <button class="btn" id="bImport">Restaurar</button>
+        <button class="btn" id="bPrint">Imprimir</button>
+      </span>
+    </div>
+    <div id="page"></div>
+  </div>
+</div>
+<div id="lightbox"><img id="lightimg" src="" alt=""></div>
+<input type="file" id="fileImg" accept="image/*" style="display:none">
+<input type="file" id="fileJson" accept=".json,application/json" style="display:none">
+<script>
+var SEED = {"v": 3, "paginas": [{"nombre": "Consulta de inventario", "grupo": "busq", "tipo": "buscador", "agrupa": false, "tabla": "", "cols": [], "bloques": [], "filas": []}, {"nombre": "Exterior", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [{"t": "6.1 Localización y Ámbito Geográfico", "txt": "País: República Bolivariana de Venezuela.\nEstado: Táchira.\nMunicipio: San Cristóbal.\nDirección: El Komplex Gym se ubica en la Avenida Martín Marciales, en Pueblo Nuevo. La marca se encuentra estratégicamente ubicada en el corazón de la zona norte de San Cristóbal, un sector caracterizado por su alta actividad comercial y residencial de nivel socioeconómico medio-alto. Esta ubicación permite una conexión directa con las principales arterias viales de la ciudad, facilitando el acceso de los socios provenientes de zonas aledañas como Pirineos y Barrio Obrero.\nPunto de Referencia: Ubicado dentro de las instalaciones del DORADO CLUB, en el local número 7. Para analizar nuestro entorno, debemos tomar en cuenta la visibilidad del Dorado Club, de forma que la captación de clientes por vía física depende del ingreso del complejo y de los anuncios exteriores al gimnasio.\n\nPara tener una visión global del encuentro físico, nos fijamos en los alrededores del gimnasio. Nos ubicamos cerca del Hipermercado Baratta, el Centro Empresarial Santafé, el Centro Latino, de la discoteca Trisquel y la Universidad de los Andes (ULA). Se han mencionado estas ubicaciones por ser las más cercanas al Dorado Club, por lo que las personas que transitan estos sitios son los más propensos a visualizar el Dorado Club.", "imgs": []}, {"t": "Visibilidad del Dorado Club", "txt": "Si observamos con atención, nuestra visibilidad depende de la Av. Ferrero Tamayo. La Avenida Las Pilas no tiene visibilidad directa con el complejo, pero se ha realizado una valla publicitaria del Komplex Gym entre la intercepción de la Avenida Las Pilas y la Avenida Martín Marciales.\n\nEl Hipermercado Baratta representa un ligero obstáculo visual para el Dorado Club, sin embargo, esto no es del todo negativo. Por consecuencia de la estructura y estética de las instalaciones que disponen de un Estacionamiento Privado, el Club crea un entorno más discreto, de manera que las personas que llegan a este e ingresan al Dorado Club, deben tener un gusto por la privacidad y comodidad.\n\nCon estos dos puntos, concluimos que el Dorado Club es un espacio Privado. De manera que, el Komplex Gym debe corresponder a esto, manejándose con un público pudiente y discreto.\n\nSin embargo, nuestra publicidad debe mantenerse impoluta, para no dar una impresión descuidada que espante a nuestro público mayoritario. Uno de estos descuidos podemos verlo en la Valla Publicitaria que presenta signos de deterioro. Dentro del Dorado Club también se ha visto un ligero deterioro en nuestra señalética de orientación.", "imgs": []}, {"t": "6.2.1 Plano de Entrada", "txt": "En el apartado 6.1 se expuso un seguimiento de la ubicación y orientación del gimnasio. Aquí se registra el primer vistazo a las instalaciones.", "imgs": []}, {"t": "6.2.2 Plano de Salida", "txt": "Es el último impacto visual que tiene el afiliado antes de abandonar las instalaciones, que se encuentra en el mismo espacio que el plano de entrada, pero con una elevación tal que el afiliado lo visualice al bajar las escaleras para retirarse.\n\nEl plano de salida es un excelente elemento visual que acompaña al establecimiento desde hace más de cuatro años, por lo que es observable su desgaste o desactualización con el tiempo.", "imgs": []}, {"t": "6.2.3 Escaleras", "txt": "En las escaleras también hay luces blancas y rojas que generan un impacto visual.\n\nSin embargo, no todas las luces están en funcionamiento. Y las escaleras se encuentran ligeramente abolladas.", "imgs": []}], "filas": []}, {"nombre": "Entrada", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": [["Ítems Principales", "Instalaciones", "Santamaría", "1", "B", "Desgaste ligero"], ["Ítems Principales", "Elemento Visual", "Logo con luces Led", "2", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Luces Led Roja", "2", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Escaleras", "-", "B", "Desgaste y abolladuras"], ["Ítems Principales", "Equipamiento", "Luces", "7", "A", "Buen estado"], ["Ítems Principales", "Elemento Visual", "Mural", "2", "A", "Buen estado"], ["Ítems Principales", "Elemento Visual", "Letrero motivacional", "1", "B", "Desactualizado"], ["Ítems Principales", "Seguridad", "Luz de Emergencia", "1", "?", "?"], ["Ítems Secundarios", "Seguridad", "Candado Santamaría", "1", "A", "Buen estado"], ["Ítems Secundarios", "Seguridad", "Llave Santamaría", "2", "A", "Buen estado"]]}, {"nombre": "Lobby", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": [["Ítems Principales", "Mobiliario Principal", "Mostrador de Recepción", "-", "B", "Cerámica agrietada"], ["Ítems Principales", "Mobiliario Auxiliar", "Mostrador de Espera", "-", "B", "Cubierta deteriorada y vidrio rayado"], ["Ítems Principales", "Mobiliario Auxiliar", "Escritorio", "-", "B", "Tablas sueltas, cables expuestos"], ["Ítems Principales", "Seguridad", "Torniquete", "-", "B", "Mal estado, pero funcional la entrada principal"], ["Ítems Principales", "Instalaciones", "Elevador", "-", "D", "No funciona"], ["Ítems Principales", "Instalaciones", "Logo de Neón", "1", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Pared Lobby", "-", "B", "Huecos en la pared"], ["Ítems Principales", "Tecnología (Visual)", "Televisor", "-", "A", "Buen estado"], ["Ítems Principales", "Tecnología (Sistema de Audio)", "Rack de Audio (Crown 1160MA)", "-", "B", "Polvo acumulado en las ranuras de ventilación y cables expuestos"], ["Ítems Principales", "Tecnología", "Dispositivo de Reconocimiento Facial", "-", "A", "Buen estado, sin embargo, los cables sobresalen"], ["Ítems Principales", "Tecnología", "Face ID:HIKVISION DS-K1TA70MI-T Face", "-", "A", "Buen estado"], ["Ítems Principales", "Tecnología", "Powerbank del Face ID", "-", "A", "Buen estado, sin embargo, los cables sobresalen"], ["Ítems Principales", "Tecnología", "Minipc HP Elite Desk", "-", "A", "Buen estado"], ["Ítems Principales", "Tecnología", "Monitor", "-", "B", "Base dañada"], ["Ítems Principales", "Tecnología", "Teclado", "-", "A", "Buen estado"], ["Ítems Principales", "Tecnología", "Mouse", "-", "A", "Buen estado"], ["Ítems Principales", "Tecnología", "Laptop", "-", "A", "Funcional. Utilizada para clases Grupales"], ["Ítems Principales", "Tecnología", "Router", "-", "A", "Buen estado"], ["Ítems Principales", "Mobiliario", "Gavetero A", "-", "B", "Deterioro Leve"], ["Ítems Principales", "Mobiliario", "Gavetero B", "-", "B", "Deterioro en el laminado/pintura"], ["Ítems Principales", "Seguridad", "Caja registradora", "-", "A", "Funcional"], ["Ítems Principales", "Equipamiento", "Máquina Fiscal", "-", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Puerta Lobby", "-", "B", "Pomo dañado"], ["Ítems Principales", "Seguridad", "Extintor", "-", "A", "Al día"], ["Ítems Principales", "Seguridad", "Manguera contra Incendios", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "impresora fiscal", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Luces colgantes", "3", "A", "Buen estado"], ["Ítems Secundarios", "Operativo", "Estación de desechos", "1", "A", "Buen estado"], ["Ítems Secundarios", "Elemento Visual", "Símbolo luminoso (K)", "1", "B", "Faltan baterías"], ["Ítems Secundarios", "Elemento Visual", "Reloj Lobby", "2", "B", "Faltan baterías"], ["Ítems Secundarios", "Mobiliario", "Silla Ergonómica", "1", "B", "Rueda dañada"], ["Ítems Secundarios", "Mobiliario", "Silla", "1", "B", "Desgastada, con manchas en el tapizado"], ["Ítems Secundarios", "Mobiliario", "Silla Plegable", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipo", "Regleta (extensión)", "2", "A", "Funcional"], ["Ítems Secundarios", "Seguridad", "Llave de Caja registradora", "1", "B", "Ligeramente doblada"], ["Ítems Secundarios", "Equipamiento", "Regulador de Corriente", "1", "A", "Buen estado"], ["Ítems Secundarios", "Elemento Visual", "Letrero de Normas", "1", "A", "Buen estado"], ["Ítems Secundarios", "Instalaciones", "Cortina", "1", "B", "Falta limpieza"], ["Ítems Secundarios", "Elemento Visual", "Maceta y Planta", "2", "A", "Buen estado"], ["Ítems Terciarios", "Operativo", "Grapadora", "1", "A", "Buen estado"], ["Ítems Terciarios", "Operativo", "Abre hueco", "1", "A", "Buen estado"], ["Ítems Terciarios", "Equipamiento", "Control Remoto", "2", "B", "Faltan Pilas"], ["Ítems Terciarios", "Operativo", "Archivador", "1", "C", "Desgastado"], ["Ítems Terciarios", "Operativo", "Libreta", "1", "C", "Desgastada"], ["Ítems Terciarios", "Instalaciones", "Tablero de Llaves", "1", "C", "Pegado con cinta"], ["Ítems Terciarios", "Operativo", "Bandeja Organizacional", "1", "A", "Buen estado"], ["Ítems Terciarios", "Operativo", "Tarjetera de Malla", "1", "A", "Buen estado"], ["Ítems Terciarios", "Operativo", "Portalápices", "1", "A", "Buen estado"]]}, {"nombre": "Descanso", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": [["Ítems", "Elemento Visual", "Letrero Flurecente", "1", "A", "Buen estado"], ["Ítems", "Mobiliario", "Mesa", "1", "A", "Buen estado"], ["Ítems", "Mobiliario", "Sillas plasticas", "3", "A", "Buen estado"], ["Ítems", "Mobiliario", "Puff", "2", "A", "Buen estado"], ["Ítems", "Instalaciones", "Lockers", "36", "B", "Falta retoque de pintura"], ["Ítems", "Seguridad", "Camilla de primeros auxilios", "1", "A", "Buen estado"], ["Ítems", "Elemento Visual", "Cartel de camilla", "1", "A", "Buen estado"], ["Ítems", "Elemento Visual", "Cartel de Bienvenida", "1", "A", "Buen estado"], ["Ítems", "Elemento Visual", "Cartel de vía de escape", "1", "A", "Buen estado"], ["Ítems", "Climatización", "Extractor", "1", "B", "Pegado con teipe, se ve mal a la vista"], ["Ítems", "Equipamiento", "Estación de desechos", "1", "A", "Buen estado"]]}, {"nombre": "Entrada GYM", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": [["Ítems Principales", "Instalaciones", "Muro baños", "1", "B", "Daños y rayaduras"], ["Ítems Principales", "Instalaciones", "Pared Entrada", "1", "B", "Al lado del filtro de agua, esta algo ahí que obstaculiza la vista, y están desgastadas las esquinas"], ["Ítems Principales", "Instalaciones", "Filtro", "1", "B", "Óxido y goteras"], ["Ítems Principales", "Instalaciones", "Espejo", "1", "B", "Manchado"], ["Ítems Principales", "Instalaciones", "Stand", "-", "C", "No está en uso"], ["Ítems Principales", "Instalaciones", "Escaleras al gimnasio", "", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Ventana", "", "A", "Buen estado"], ["Ítems Principales", "Tecnología", "Televisor", "1", "A", "Buen estado"], ["Ítems Principales", "Mobiliario", "Mostrador", "1", "A", "Buen estado"], ["Ítems Secundarios", "Mobiliario", "Taburetes", "3", "B", "Deterioro en la pintura"], ["Ítems Secundarios", "Equipamiento", "Cornetas", "2", "B", "Buen estado, pero a la vista del cliente"], ["Ítems Secundarios", "Elemento Visual", "Valla Publicitaria C", "-", "A", "Nueva y en Buenas condiciones"], ["Ítems Secundarios", "Elemento Visual", "Valla Publicitaria D", "-", "D", "Sin utilizar"]]}, {"nombre": "Oficina G.", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": [["Ítems", "Seguridad", "Caja de Llaves", "", "C", "Dañada la cerradura"], ["Ítems", "Seguridad", "Caja Fuerte", "", "C", "Desajustada, no cierra bien"], ["Ítems", "Seguridad", "Extintor", "", "B????", "Fecha de renovación??"], ["Ítems", "Mobiliario", "Escritorio", "", "A", "Buen estado"], ["Ítems", "Mobiliario", "Archivador Metálico", "", "B", "Limpieza"], ["Ítems", "Mobiliario", "Armario de Herramientas", "", "B", "Portacandado oxidado"], ["Ítems", "Mobiliario", "Estantería de Vidrio", "", "A", "Buen estado"], ["Ítems", "Mobiliario", "Estantería de Madera", "", "B", "Tabla suelta"], ["Ítems", "Mobiliario", "Gavetero", "", "B", "Gaveta desajustada"], ["Ítems", "Mobiliario", "Silla 1", "", "A", "Buen estado"], ["Ítems", "Mobiliario", "Silla 2", "", "A", "Buen estado"], ["Ítems", "Tecnología", "PC de Escritorio", "", "A", "Buen estado"], ["Ítems", "Tecnología", "Monitor", "", "A", "Buen estado"], ["Ítems", "Tecnología", "Teclado", "", "A", "Buen estado"], ["Ítems", "Tecnología", "Mouse", "", "A", "Buen estado"], ["Ítems", "Climatización", "Aire Acondicionado", "", "C", "Expulsa Aire Caliente"], ["Ítems", "Instalaciones", "Soporte Aire Nuevo", "", "A", "Buen estado"], ["Ítems", "Instalaciones", "Soporte Aire Viejo", "", "C", "No cumple función"], ["Ítems", "Instalaciones", "Pared Lateral Izquierda", "", "B", "Maltratada y mal pintada"], ["Ítems", "Instalaciones", "Pared Lateral Derecha", "", "B", "Rayada"], ["Ítems", "Instalaciones", "Pared Frontal (ventanal)", "", "B", "Desgaste y colores no acorde"], ["Ítems", "Instalaciones", "Pared de Acceso", "", "B", "Agujero en la pared"], ["Ítems", "Instalaciones", "Marco de la puerta", "", "B", "Desgastado"], ["Ítems", "Instalaciones", "Tapa de Electricidad", "", "B", "Desajustada y mal pintada"], ["Ítems Secundarios", "Operativo y Suministro", "Regleta 1", "1", "C", "Sirve la mitad"], ["Ítems Secundarios", "Operativo y Suministro", "Regleta 2", "1", "B", "Funcional, sin embargo es bastante vieja"], ["Ítems Secundarios", "Operativo y Suministro", "Bote de desechos", "1", "A", "Buen estado"], ["Ítems Secundarios", "Operativo y Suministro", "Organizador de Sobremesa", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Alfombra", "1", "A", "Sin uso"], ["Ítems Secundarios", "Seguridad", "Llave", "", "", ""], ["Ítems Secundarios", "Seguridad", "Llave", "", "", ""], ["Ítems Secundarios", "Seguridad", "Llave", "", "", ""], ["Ítems Secundarios", "Seguridad", "Llave", "", "", ""], ["Ítems Secundarios", "Equipamiento", "Pizarra", "1", "A", "Buen estado"], ["Ítems Secundarios", "Operativo y Suministro", "Archivadores", "33", "A", "Antiguos en su mayoría"]]}, {"nombre": "Baño Damas", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": [["Ítems Principales", "Instalaciones", "Lavamanos", "3", "A", "Buen Estado"], ["Ítems Principales", "Instalaciones", "Espejos A", "3", "B", "Acumulación de polvo y suciedad"], ["Ítems Principales", "Instalaciones", "Espejos B", "1", "A", "Buen Estado"], ["Ítems Principales", "Instalaciones", "Duchas", "3", "B", "Óxido y problemas estéticos"], ["Ítems Principales", "Instalaciones", "Tablero Sauna", "1", "B", "Funcional, pero ligeramente despegado"], ["Ítems Principales", "Instalaciones", "Sauna", "1", "A", "Buen Estado"], ["Ítems Principales", "Instalaciones", "Deposito A( baño de vapor)", "-", "B", "Cumple Otra Función"], ["Ítems Principales", "Instalaciones", "Deposito B", "-", "??", "???"], ["Ítems Principales", "Instalaciones", "Sanitarios", "3", "A", "Buen Estado"], ["Ítems Principales", "Instalaciones", "Secador de manos", "1", "D", "Desconectado, problemas con el sensor d movimiento"], ["Ítems Principales", "Instalaciones", "Lockers", "20", "B", "Desgaste y Corrosión"], ["Ítems Principales", "Instalaciones", "Extractor", "1", "A", "Funcional"], ["Ítems Principales", "Climatización", "Aire Acondicionado", "1", "A", "Buen Estado"], ["Ítems Principales", "Mobiliario", "Bancos de madera baño A", "2", "A", "Buen Estado"], ["Ítems Secundarios", "Instalaciones", "Luces", "3", "a", "buen estado"], ["Ítems Secundarios", "Instalaciones", "Luces Sauna", "2", "A", "Buen Estado"], ["Ítems Secundarios", "Instalaciones", "Calentador Sauna", "1", "B", "Limpieza"], ["Ítems Secundarios", "Instalaciones", "Ventana Baño", "1", "a", "buen estado"], ["Ítems Secundarios", "Instalaciones", "Puerta Sauna A", "1", "b", "descuadrada"], ["Ítems Secundarios", "Instalaciones", "Puertas Sanitarios A", "3", "B", "Una no cierra bien"], ["Ítems Secundarios", "Instalaciones", "Puertas Duchas A", "3", "A", "Buen Estado"], ["Ítems Secundarios", "Equipamiento", "Soporte Jabón A", "2", "B", "Despegado"], ["Ítems Secundarios", "Equipamiento", "Soporte Jabón B (Ducha)", "1", "B", "Obstaculo Visual"], ["Ítems Secundarios", "Equipamiento", "El gancho ese de ropa", "2", "a", "buen estado"], ["Ítems Secundarios", "Equipamiento", "Percheros", "2", "A", "Buen Estado"], ["Ítems Secundarios", "Operativo y Suministro", "Bote de Desechos", "1", "C", "Tapa rota"], ["Ítems Secundarios", "Elemento Visual", "Valla Publicitaria A", "1", "C", "Antigua"], ["Ítems Terciarios", "Operativo y Suministro", "Dispensador de Jabón", "2", "A", "Buen estado"]]}, {"nombre": "Baño Caballeros", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": [["Ítems Principales", "Instalaciones", "Lavamanos", "3", "B", "Limpieza"], ["Ítems Principales", "Instalaciones", "Soporte Lavamos", "1", "C", "Ceramica Caída"], ["Ítems Principales", "Instalaciones", "Espejos C", "1", "a", "buen estado"], ["Ítems Principales", "Instalaciones", "Duchas", "3", "a", "Óxido y problemas estéticos"], ["Ítems Principales", "Instalaciones", "Tablero Sauna", "1", "a", "Funcional, pero ligeramente despegado"], ["Ítems Principales", "Instalaciones", "Sauna", "1", "B", "Tablas partidas"], ["Ítems Principales", "Instalaciones", "Sala de Maquinas", "-", "???", "???"], ["Ítems Principales", "Instalaciones", "Baño Vapor", "1", "C", "No cumple su función (Usado como deposito)"], ["Ítems Principales", "Instalaciones", "Sanitarios", "3", "A", "Buen Estado"], ["Ítems Principales", "Instalaciones", "Secador de manos", "1", "D", "mal estdo"], ["Ítems Principales", "Instalaciones", "Lockers", "20", "B", "Desgaste, daños y Corrosión"], ["Ítems Principales", "Instalaciones", "Extractor", "1", "A", "Funcional"], ["Ítems Principales", "Instalaciones", "Baño Vapor", "1", "C", "No cumple su función"], ["Ítems Principales", "Instalaciones", "Urinarios", "2", "A", "Buen Estado"], ["Ítems Principales", "Climatización", "Aire Acondicionado", "1", "a", "buen estado"], ["Ítems Principales", "Mobiliario", "Bancos de madera baño B", "2", "A", "Buen Estado"], ["Ítems Secundarios", "Instalaciones", "Luces", "4", "A", "Buen Estado"], ["Ítems Secundarios", "Instalaciones", "Luces Sauna", "2", "A", "Buen Estado"], ["Ítems Secundarios", "Instalaciones", "Calentador Sauna", "1", "B", "Limpieza"], ["Ítems Secundarios", "Instalaciones", "Ventana Baño", "5", "a", "buen estado"], ["Ítems Secundarios", "Instalaciones", "Puerta Sauna B", "1", "B", "Tabla suelta"], ["Ítems Secundarios", "Instalaciones", "Vidrio Sauna", "1", "B", "Ligeramente suelto"], ["Ítems Secundarios", "Instalaciones", "Techo del sauna", "1", "b", "desprendido de su posicion original"], ["Ítems Secundarios", "Instalaciones", "Puertas Ducha B", "3", "C", "Una ducha cerrada al público"], ["Ítems Secundarios", "Instalaciones", "Puerta Baño B", "3", "a", "buen estado"], ["Ítems Secundarios", "Equipamiento", "Soporte Jabón C", "3", "B", "Uno funcional"], ["Ítems Secundarios", "Equipamiento", "Soporte Jabón D (Ducha)", "3", "A", "Obstaculo Visual"], ["Ítems Secundarios", "Equipamiento", "El gancho ese de ropa", "2", "a", "buen estado"], ["Ítems Secundarios", "Equipamiento", "Percheros", "2", "A", "Buen Estado"], ["Ítems Secundarios", "Operativo y Suministro", "Bote de Desechos", "1", "B", "Sin tapa"], ["Ítems Secundarios", "Elemento Visual", "Valla Publicitaria B", "2", "C", "Antigua"], ["Ítems Terciarios", "Operativo y Suministro", "Dispensador de Jabón", "1", "A", "Buen estado"], ["Ítems Terciarios", "", "secador de mano", "1", "c", "dañado"], ["Ítems Terciarios", "", "espejo lavamanos", "1", "c", "espejo partido"], ["Ítems Terciarios", "", "papeleras de los sanitarios", "3", "c", "partidas"]]}, {"nombre": "Cardio", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": [["Ítems Principales", "Instalaciones", "Pilares", "-", "B", "Pintura Corroida"], ["Ítems Principales", "Instalaciones", "Ventanales", "-", "C", "Vidrio roto"], ["Ítems Principales", "Instalaciones", "Portalámparas", "7", "B", "Buen estado. Algunas sin bombillo."], ["Ítems Principales", "Tecnología", "Televisor", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Caminadora A", "-", "C", "Esperando mantenimiento por garantía"], ["Ítems Principales", "Equipamiento", "Caminadora B", "-", "C", "No sirve la inclinación"], ["Ítems Principales", "Equipamiento", "Caminadora C", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Caminadora D", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Caminadora E", "-", "C", "No sirve la inclinación"], ["Ítems Principales", "Equipamiento", "Caminadora F", "-", "C", "No sirve la inclinación"], ["Ítems Principales", "Equipamiento", "Caminadora G", "-", "C", "No sirve la inclinación"], ["Ítems Principales", "Equipamiento", "Elíptica A", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Elíptica B", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Elíptica C", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Elíptica D", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Elíptica E", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Elíptica Life Fitness", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Bicicleta Vertical", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Bicicleta Recumbente", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Bicicleta Recumbente", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Escaladora", "-", "A", "Buen estado"], ["Ítems Principales", "mobiliario", "mesa", "1", "A", "Buen estado"]]}, {"nombre": "Grupales", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": [["Ítems Principales", "Instalaciones", "Pared", "-", "B", "Manchas y grietas"], ["Ítems Principales", "Instalaciones", "Espejos", "", "C", "Manchas"], ["Ítems Principales", "Instalaciones", "Almacenamiento de balones", "-", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Ventanas", "", "B", "Buen estado"], ["Ítems Principales", "Instalaciones", "Puerta", "1", "C", "Pomo dañado. Quejas al respecto."], ["Ítems Principales", "Instalaciones", "Luces", "", "A", "Buen estado"], ["Ítems Principales", "Climatización", "Ventilación", "", "", ""], ["Ítems Principales", "Climatización", "Aire Acondicionado", "1", "A", "buen estado"], ["Ítems Principales", "Equipamiento", "Cornetas", "", "C", "No están en uso"], ["Ítems Principales", "Equipamiento", "Dispensador de jabón y toallas", "", "C", "No están en uso"], ["Ítems Principales", "Mobiliario", "Mueble auxiliar", "1", "B", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Balones de yoga", "18", "A", "Buen estado. Excepto uno que está desinflado"], ["Ítems Secundarios", "Equipamiento", "Balones largos", "2", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Plataforma de Step", "9", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Plataforma de Step Peq.", "29", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Rack de Equipo", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Balón medicinal", "3", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Ladrillo de Yoga", "10", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Rack de colchonetas", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Colchonetas", "15", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Varas", "", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Trampolines", "10", "A", "Buen estado"]]}, {"nombre": "Spinning", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": []}, {"nombre": "Musculación", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [{"t": "Inventario de mancuernas", "txt": "99 mancuernas en total: 56 con goma y 43 sin goma.\n\nHexagonales (kg): 62 unidades — 47 con goma, 15 sin goma.\nRedondas (lb): 37 unidades — 9 con goma, 28 peladas.\n\nEn las hexagonales, las 47 \"con goma\" incluyen 8 unidades con la goma dañada pero aún presente.\n\nCriterio de estado aplicado: de 15 kg en adelante con goma se registran en B; de 12,5 kg hacia abajo con goma en A; toda mancuerna sin goma o pelada en C. Excepción: las de 40 kg quedan en A. En las redondas el criterio se aplicó por peso equivalente (15 kg ≈ 33 lb; 12,5 kg ≈ 27,5 lb).\n\nLas mancuernas de vinilo se mantienen registradas aparte, no entran en esta cuenta.", "imgs": []}], "filas": [["Ítems Principales", "Instalaciones", "Paredes", "-", "B", "Manchas y Pintura corroida"], ["Ítems Principales", "Instalaciones", "Pilares", "-", "B", "Pintura Corroida"], ["Ítems Principales", "Instalaciones", "Portalámparas", "20", "B", "Buen estado. una sin bombillo."], ["Ítems Principales", "Instalaciones", "Luces Led rojas", "2", "A", "Buen estado"], ["Ítems Principales", "Elemento Visual", "Vinilo decorativo en pared", "-", "B", "Deterioro (desprendimiento)"], ["Ítems Principales", "Instalaciones", "Espejos", "-", "C", "Manchas (Reclamos al respecto)"], ["Ítems Principales", "Instalaciones", "Extractor", "-", "A", "Funcional"], ["Ítems Principales", "Instalaciones", "Ventanal A", "-", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Ventanal B", "-", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Ventanal C", "-", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Ventanal D", "-", "B", "Persiana sucia, y la persina oculta el deterioro"], ["Ítems Principales", "Instalaciones", "Ventanal E", "-", "C", "Falta retoque de pintura y limpieza. Vidrio agrietado"], ["Ítems Principales", "Instalaciones", "Ventanal F", "-", "B", "Buen estado"], ["Ítems Principales", "Instalaciones", "Sala de Máquinas", "-", "D", "Máquinaria ascensor no funcionando. Cajón de Sala Máq. Deteriorado"], ["Ítems Principales", "Instalaciones", "Ventana A", "-", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Ventana B", "3", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Ventana C", "3", "B", "Falta retoque de pintura alrededor"], ["Ítems Principales", "Instalaciones", "Ventana D", "-", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Ventana E", "3", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Ventana F", "-", "B", "Vidrio quebrado"], ["Ítems Principales", "Instalaciones", "Ventana G", "-", "B", "Falta retoque de pintura"], ["Ítems Principales", "Instalaciones", "Ventana H", "-", "C", "Falta Vidrio"], ["Ítems Principales", "Instalaciones", "Ventana I", "-", "A", "Buen estado"], ["Ítems Principales", "Seguridad", "Cajón de luces de Emergencia", "-", "A", "Buen estado"], ["Ítems Principales", "Seguridad", "Luces de Emergencia", "-", "A", "Buen estado"], ["Ítems Principales", "Climatización y Confort", "Cortina de Aire", "3", "B", "Funcional. Pero no bastan para climatizar el gimnasio"], ["Ítems Principales", "Tecnología", "Decodificador", "-", "A", "Buen estado"], ["Ítems Principales", "Tecnología", "Televisor  A", "-", "A", "Buen estado"], ["Ítems Principales", "Tecnología", "Televisor  B", "-", "A", "Buen estado"], ["Ítems Principales", "Tecnología", "Televisor C", "1", "A", "Buen estado"], ["Ítems Principales", "Tecnología", "Altavoz de Techo", "-", "A", "Buen estado"], ["Ítems Principales", "Seguridad", "Detector de Humo", "-", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Dispensadores (Jabón y toallas)", "?", "D", "No están en Uso"], ["Ítems Principales", "Equipamiento", "Banco de Press de Hombro", "2", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Banco multiposición", "2", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Banco Predicador", "1", "B", "Deterioro Leve"], ["Ítems Principales", "Equipamiento", "Máquina Curl de Biceps", "1", "B", "Deterioro"], ["Ítems Principales", "Equipamiento", "Banco plano para Press", "2", "B", "Deterioro"], ["Ítems Principales", "Equipamiento", "Rack y Banco de Press Militar", "1", "B", "Deterioro"], ["Ítems Principales", "Equipamiento", "Máquina de Press de Hombro", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Máquina de Dips", "1", "B", "Desgaste Leve"], ["Ítems Principales", "Equipamiento", "Máquina Levantamiento lateral", "1", "B", "Deterioro"], ["Ítems Principales", "Equipamiento", "Máquina de Press Inclinado", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Banco de Press Inclinado", "2", "B", "Deterioro"], ["Ítems Principales", "Equipamiento", "Máquina de Press de Pecho", "3", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Torre de Entrenamiento Funcional", "1", "B", "Deterioro"], ["Ítems Principales", "Equipamiento", "Banco de Hiperextensión", "1", "B", "Deterioro Leve"], ["Ítems Principales", "Equipamiento", "Torre de Entrenamiento", "1", "B", "Deterioro Leve"], ["Ítems Principales", "Equipamiento", "Máquina de Abdominales Sentado", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Banco Declinado (Abdominales)", "1", "B", "Deterioro Leve"], ["Ítems Principales", "Equipamiento", "Máquina Abdominales Acostado", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Banco Plano", "1", "B", "Deterioro Leve"], ["Ítems Principales", "Equipamiento", "Máquina de Press de Pierna", "1", "B", "Oxido y Desgaste"], ["Ítems Principales", "Equipamiento", "Máquina de Hiperextensión de Pie", "1", "B", "Deterioro"], ["Ítems Principales", "Equipamiento", "Rack de Sentadilla", "1", "B", "Deterioro Leve"], ["Ítems Principales", "Equipamiento", "Máquina de Hip Thrust", "1", "B", "Deterioro"], ["Ítems Principales", "Equipamiento", "Máquina de Sentadilla Bulgara", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Máquina de Extensión de Cuádriceps", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Máquina de Squat A", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Máquina de Squat B", "1", "B", "Deterioro Leve"], ["Ítems Principales", "Equipamiento", "Máquina de Elevación de Talón", "1", "B", "Deterioro"], ["Ítems Principales", "Equipamiento", "Máquina para Femorales", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Máquina para Cuádriceps con Discos", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Soporte para Sentadillas", "1", "B", "Deterioro Leve"], ["Ítems Principales", "Equipamiento", "Máquina de Abductores", "2", "B", "Deterioro"], ["Ítems Principales", "Equipamiento", "Máquina Elevación de Talón con peso", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Máquina de Empuje de Pierna", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Máquina de Contracción Femoral Sentado", "1", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Máquina de Contracción Femoral Acostado", "1", "B", "Deterioro"], ["Ítems Principales", "Equipamiento", "Rack de Squat con Seguros", "1", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Multifuerzas", "1", "B", "Deterioro en los Asientos y pintura"], ["Ítems Principales", "Mobiliario", "Rack de Mancuerna Horizontal", "2", "A", "Buen estado"], ["Ítems Principales", "Mobiliario", "Rack Vertical de Almacenamiento", "1", "B", "Deterioro Leve"], ["Ítems Principales", "Mobiliario", "Rack Horizontal de Barras de Acero", "1", "B", "Deterioro"], ["Ítems Principales", "Mobiliario", "Mesa Auxiliar", "3", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Tapete de Alto Impacto", "9", "A", "Buen estado"], ["Ítems Principales", "Equipamiento", "Rack de Almacenamiento Rojo", "2", "A", "Buen estado"], ["Ítems Principales", "Elemento Visual", "Mural de Gimnasio", "1", "A", "Buen estado"], ["Ítems Principales", "Elemento Visual", "Valla Publicitaria", "5", "C", "Buen estado. Tres Sin Uso."], ["Ítems Principales", "Instalaciones", "Caja de Breakers", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 5 kg", "6", "A", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 7,5 kg", "6", "A", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 10 kg", "6", "A", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 12,5 kg", "4", "A", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 12,5 kg", "2", "C", "Sin goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 15 kg", "3", "B", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 15 kg", "2", "C", "Sin goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 17,5 kg", "5", "B", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 20 kg", "3", "B", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 20 kg", "3", "C", "Sin goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 22,5 kg", "4", "B", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 22,5 kg", "2", "C", "Sin goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 25 kg", "2", "C", "Sin goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 27,5 kg", "8", "B", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 30 kg", "4", "C", "Sin goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna hexagonal 40 kg", "2", "A", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 5 lb", "2", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 10 lb", "3", "A", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 10 lb", "1", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 15 lb", "2", "A", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 15 lb", "1", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 20 lb", "4", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 25 lb", "1", "A", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 25 lb", "3", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 30 lb", "2", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 35 lb", "2", "B", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 35 lb", "2", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 40 lb", "2", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 45 lb", "2", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 50 lb", "1", "B", "Con goma"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 50 lb", "1", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 55 lb", "2", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 60 lb", "2", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 65 lb", "2", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Mancuerna redonda 70 lb", "2", "C", "Pelada (sin goma)"], ["Ítems Secundarios", "Equipamiento", "Manc. Vinilo. 2 Libras.", "8", "B", "Algunas sin caucho"], ["Ítems Secundarios", "Equipamiento", "Manc. Vinilo. 3 Libras", "8", "B", "Desgaste leve"], ["Ítems Secundarios", "Equipamiento", "Manc. Vinilo. 4 Libras", "6", "B", "Desgaste leve"], ["Ítems Secundarios", "Equipamiento", "Manc. Vinilo. 5 Libras", "12", "B", "Desgaste leve"], ["Ítems Secundarios", "Equipamiento", "Manc. Vinilo. 6 Libras", "9", "B", "Desgaste leve"], ["Ítems Secundarios", "Equipamiento", "Manc. Vinilo. 7 Libras", "6", "B", "Desgaste leve"], ["Ítems Secundarios", "Equipamiento", "Manc. Vinilo. 8 Libras", "2", "B", "Desgaste leve"], ["Ítems Secundarios", "Equipamiento", "Manc. Vinilo. 4 Kg.", "8", "B", "Desgaste leve"], ["Ítems Secundarios", "Equipamiento", "Barra fija 10 Libras", "1", "B", "Identificador dañado"], ["Ítems Secundarios", "Equipamiento", "Barra fija 30 Libras", "1", "B", "Identificador dañado"], ["Ítems Secundarios", "Equipamiento", "Barra fija 40 Libras", "1", "B", "Identificador dañado"], ["Ítems Secundarios", "Equipamiento", "Barra fija 50 Libras", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra fija 60 Libras", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra fija 70 Libras", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra fija 90 Libras", "1", "B", "Identificador dañado"], ["Ítems Secundarios", "Equipamiento", "Barra fija 100 Libras", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra fija 110 Libras", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Disco 5 Libras", "17", "", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Disco 10 Libras", "17", "", "Caucho desgastado"], ["Ítems Secundarios", "Equipamiento", "Disco 25 Libras", "12", "", "Caucho desgastado"], ["Ítems Secundarios", "Equipamiento", "Disco 35 Libras", "16", "", "Caucho desgastado"], ["Ítems Secundarios", "Equipamiento", "Disco 45 Libras", "40", "", "La mayoría buen estado. Algunos cauchos desgastados"], ["Ítems Secundarios", "Equipamiento", "Soporte de Barra para Ejercicio", "2", "B", "Deterioro Leve"], ["Ítems Secundarios", "Equipamiento", "Soporte de Barra Olímpica", "2", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Rack de Balones", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Balón Medicinal", "10", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Rueda Abdominal", "3", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra Corta", "2", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra Romana", "2", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra Hexagonal", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Polea", "2", "C", "Deshilachada"], ["Ítems Secundarios", "Equipamiento", "Barra Lat", "2", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra V", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra Z", "2", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Mango de Remo", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Agarres en D", "7", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra Tríceps Agarre Neutro", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra recta corta", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra doble agarre D", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra Estándar", "3", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Barra Olímpica", "5", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Blaster Para Biceps", "1", "B", "Deterioro Leve"], ["Ítems Secundarios", "Equipamiento", "Soporte de Accesorios", "3", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Seguro de Pinza", "2", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Seguro de Muelle", "16", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Bastón con peso", "3", "B", "Deterioro Leve"], ["Ítems Secundarios", "Equipamiento", "Vara", "2", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Soporte de Varas Rojo", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Colchoneta", "14", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Rack de Colchonetas", "1", "A", "Buen estado"], ["Ítems Secundarios", "Instalaciones", "Persianas", "1", "B", "Falta Limpieza"], ["Ítems Secundarios", "Operativo", "Estación de desechos", "2", "A", "Buen estado"], ["Ítems Secundarios", "Elemento Visual", "Reloj", "2", "B", "Sin Baterías"]]}, {"nombre": "Sinergi 360", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": [["Ítems Principales", "Instalaciones", "Paredes", "-", "B", "Manchas y Rayones"], ["Ítems Principales", "Instalaciones", "Portalámparas", "8", "B", "Buen estado. 1 sin domo."], ["Ítems Principales", "Instalaciones", "Estación Funcional (Synergy360)", "1", "A", "Buen estado"], ["Ítems Principales", "Instalaciones", "Dispensador (Jabón y Toallas)", "2", "D", "No está en uso"], ["Ítems Principales", "Equipamiento", "Pizarrón", "1", "A", "Buen estado"], ["Ítems Principales", "Mobiliario", "Mueble Auxiliar", "1", "B", "Deterioro"], ["Ítems Principales", "Tecnología", "Equipo de Sonido", "1", "D", "No está en uso"], ["Ítems Principales", "Tecnología", "Reloj Digital", "1", "A", "Buen estado"], ["Ítems Principales", "Tecnología", "Cornetas", "2", "D", "No está en uso"], ["Ítems Principales", "Climatización y Confort", "Aire Acondicionado", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Plataforma de Step", "10", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Plataforma de Step Peq.", "53", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Cajones", "4", "B", "Deterioro"], ["Ítems Secundarios", "Equipamiento", "Saco de Boxeo", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Máquina de Abdominales", "1", "B", "Deterioro"], ["Ítems Secundarios", "Equipamiento", "Banco plano", "1", "B", "Deterioro"], ["Ítems Secundarios", "Equipamiento", "Trampolín", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Pesas Rusas", "4", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Tobilleras con peso", "2", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Protector de barra", "1", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Cuerda de Batalla", "3", "B", "Deterioro"], ["Ítems Secundarios", "Equipamiento", "Seguros de Pinza", "2", "A", "Buen estado"], ["Ítems Secundarios", "Equipamiento", "Par de Guantes", "1", "A", "Deterioro Leve"], ["Ítems Secundarios", "Equipamiento", "Focos Box", "1", "B", "Deterioro Leve"], ["Ítems Secundarios", "Equipamiento", "Plataforma de carga", "1", "A", "Buen estado"], ["Ítems Secundarios", "Instalaciones", "Espejo Circular", "1", "A", "Buen estado"], ["Ítems Secundarios", "Instalaciones", "Persianas", "1", "A", "Buen estado"]]}, {"nombre": "Depósitos", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": []}, {"nombre": "Sala Staff", "grupo": "inv", "agrupa": true, "tabla": "Inventario del área", "cols": ["Nivel", "Categoría", "Ítem / Elemento", "Cantidad", "Estado", "Observación"], "bloques": [], "filas": []}, {"nombre": "Proveedores", "grupo": "gen", "agrupa": false, "tabla": "Insumos y proveedores", "cols": ["Insumo / Ítem", "Empresa / Nombre", "Teléfono", "Dirección", "Notas"], "bloques": [{"t": "Proveedores", "txt": "Registro de las empresas y personas que suministran productos o servicios al Komplex Gym. Tomado de la agenda de insumos.", "imgs": []}], "filas": [["Escoba, recogedor, mopas, guantes y esponjas", "Baratta Hipermercado", "", "Centro de Compras Baratta, Av. Ferrero Tamayo, San Cristóbal 5001, Táchira", ""], ["Guayas para máquinas", "Solo Guayas", "0414-7350246", "Calle 5 entre carreras 10 y 11, bajando por el Hospital Central", "Tachado en la agenda: la dirección quedó anulada. Ver Carflex."], ["Guayas para máquinas", "Carflex", "", "Av. 1, Zona Industrial de Paramillo", "Anotado a mano en la agenda"], ["Papel higiénico", "Muldisan / Jesús", "0414-7071721", "Av. ULA, Barrio Santa Cecilia, San Cristóbal 5001, Táchira", ""], ["Bolsas de 150 litros", "Muldisan / Jesús", "0414-7071721", "Av. ULA, Barrio Santa Cecilia, San Cristóbal 5001, Táchira", ""], ["Fragancias", "Genéricos Pulido", "0412-1221000", "Carrera 9 y 8, diagonal al Guarauno, Centro", ""], ["Bombillos", "Suministros Eléctricos Táchira", "0414-1766385", "Entre calles 11 y 12, Carrera 11, San Cristóbal, Táchira", ""], ["Tapicería de muebles", "Maracucho", "0412-6469986", "El Mirador, vía La Tinta, pasando el colegio a mano izquierda, unos 300 metros a mano derecha", "También figura en Técnicos"], ["Tela para muebles del gym", "El Reno", "", "Cúcuta, Calle 10 #10-01, Barrio El Llano", "Anotado a mano en la agenda"]]}, {"nombre": "Técnicos", "grupo": "gen", "agrupa": false, "tabla": "Directorio de técnicos", "cols": ["Técnico", "Empresa", "Especialidad", "Teléfono", "Notas"], "bloques": [{"t": "Técnicos", "txt": "Personal técnico externo del Komplex Gym. Tomado de la agenda de técnicos.", "imgs": []}], "filas": [["Jesús", "Fitness Tienda Deportiva", "Reparación de todos los equipos de gym", "0414-9782756", "Número anterior anulado en la agenda: 0414-7196703"], ["Pedro Vicente", "Independiente", "Saunas, aires acondicionados, baños, cortinas de aire y equipos eléctricos", "0424-7607355", ""], ["Luis Alejandro Rodríguez", "Independiente", "Sistema Face ID", "0414-7485952", ""], ["Andrés", "Sigma System", "Computadoras", "0424-7234470", ""], ["Maracucho", "Independiente", "Tapicería de muebles", "0412-6469986", "También figura en Proveedores"], ["Reno", "Independiente", "Electrónica", "0424-7790141", "Anotado a mano en la agenda"]]}, {"nombre": "Lineamientos", "grupo": "gen", "agrupa": false, "tabla": "Paleta de colores y lineamientos", "cols": ["Aplicación", "Color / Elemento", "Notas"], "bloques": [{"t": "Paleta de colores", "txt": "Los números corresponden a la paleta de colores de la pintura, no a un código interno.\n\nPintura de aceite: rojo fuego 532, negro 570, blanco 505.\n\nPintura de paredes: gris concreto, blanco lino y negro.", "imgs": []}, {"t": "Iluminación", "txt": "Las luces del gimnasio siempre son cálidas.\n\nSolo en los baños, depósitos y las oficinas deben tener luz blanca o fría.", "imgs": []}], "filas": [["Pintura de aceite", "Rojo fuego", "Paleta 532. Color principal de la marca"], ["Pintura de aceite", "Negro", "Paleta 570"], ["Pintura de aceite", "Blanco", "Paleta 505"], ["Pintura de paredes", "Gris concreto", ""], ["Pintura de paredes", "Blanco lino", ""], ["Pintura de paredes", "Negro", ""], ["Iluminación", "Áreas de entrenamiento y comunes", "Luz cálida siempre"], ["Iluminación", "Baños, depósitos y oficinas", "Luz blanca o fría"]]}]};
+var KEY = 'komplex_v1';
+var D = null, cur = 0, edit = false, filtro = '', navq = '', pendiente = -1, t_save = null;
+var bq = { area: '', cat: '', est: '', txt: '' };
+
+function $(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function tam() {
+  var n = 0;
+  try { n = JSON.stringify(D).length; } catch (e) {}
+  return (n / 1048576).toFixed(2);
+}
+function aviso(txt) { $('estado').innerHTML = esc(txt); }
+
+/* ---------------- DATOS ---------------- */
+function cargar() {
+  var raw = null;
+  try { raw = localStorage.getItem(KEY); } catch (e) {}
+  if (raw) { try { D = JSON.parse(raw); } catch (e) { D = null; } }
+  if (!D || !D.paginas || !D.paginas.length) { D = SEED; guardar(); return; }
+  if (migrar()) guardar();
+}
+
+/* Anade lo nuevo de la plantilla sin tocar lo que el usuario ya escribio. */
+function migrar() {
+  if (D.v >= SEED.v) return false;
+  var i, k, s, p, f, nota, hayBuscador = false;
+  for (i = 0; i < D.paginas.length; i++) {
+    if (D.paginas[i].tipo === 'buscador') hayBuscador = true;
+  }
+  for (i = 0; i < SEED.paginas.length; i++) {
+    s = SEED.paginas[i];
+    if (s.tipo === 'buscador') {
+      if (!hayBuscador) D.paginas.unshift(s);
+      continue;
+    }
+    if (s.grupo !== 'gen') continue;
+    p = null;
+    for (k = 0; k < D.paginas.length; k++) {
+      if (D.paginas[k].nombre === s.nombre) { p = D.paginas[k]; break; }
+    }
+    if (!p) { D.paginas.push(s); continue; }
+    p.cols = s.cols;
+    p.tabla = s.tabla;
+    if (!p.filas.length) { p.filas = s.filas; p.bloques = s.bloques; }
+  }
+  /* Inventario de mancuernas: solo se reemplaza si el area sigue intacta. */
+  p = null;
+  for (k = 0; k < D.paginas.length; k++) {
+    if (D.paginas[k].nombre === 'Musculaci\u00f3n') p = D.paginas[k];
+  }
+  if (p && p.filas.length === 158 && !p.bloques.length) {
+    for (k = 0; k < SEED.paginas.length; k++) {
+      if (SEED.paginas[k].nombre === 'Musculaci\u00f3n') {
+        p.filas = SEED.paginas[k].filas;
+        p.bloques = SEED.paginas[k].bloques;
+      }
+    }
+  }
+  /* Los numeros de paleta pasan a la columna de notas. */
+  p = null;
+  for (k = 0; k < D.paginas.length; k++) {
+    if (D.paginas[k].nombre === 'Lineamientos') p = D.paginas[k];
+  }
+  if (p && p.filas.length && p.filas[0].length === 4) {
+    for (k = 0; k < p.filas.length; k++) {
+      f = p.filas[k];
+      nota = f[2] ? ('Paleta ' + f[2] + (f[3] ? '. ' + f[3] : '')) : (f[3] || '');
+      p.filas[k] = [f[0], f[1], nota];
+    }
+  }
+  D.v = SEED.v;
+  return true;
+}
+function guardar() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(D));
+    aviso('Guardado · ' + tam() + ' MB usados');
+  } catch (e) {
+    aviso('ERROR: no se pudo guardar (espacio lleno)');
+    alert('No se pudo guardar. El navegador solo permite unos 5 MB.\n\nHaga "Respaldo" para bajar una copia y elimine algunas imágenes pesadas.');
+  }
+}
+function tocar() {
+  aviso('Guardando...');
+  if (t_save) clearTimeout(t_save);
+  t_save = setTimeout(guardar, 500);
+}
+function pag() { return D.paginas[cur]; }
+
+/* ---------------- NAVEGACION ---------------- */
+function coincide(p, q) {
+  if (!q) return true;
+  q = q.toLowerCase();
+  if (p.nombre.toLowerCase().indexOf(q) >= 0) return true;
+  var i, j;
+  for (i = 0; i < p.filas.length; i++) {
+    for (j = 0; j < p.filas[i].length; j++) {
+      if (String(p.filas[i][j]).toLowerCase().indexOf(q) >= 0) return true;
+    }
+  }
+  for (i = 0; i < p.bloques.length; i++) {
+    if ((p.bloques[i].t + ' ' + p.bloques[i].txt).toLowerCase().indexOf(q) >= 0) return true;
+  }
+  return false;
+}
+function cuenta(p, q) {
+  if (!q) return p.filas.length;
+  q = q.toLowerCase();
+  var n = 0, i;
+  for (i = 0; i < p.filas.length; i++) {
+    if (p.filas[i].join(' ').toLowerCase().indexOf(q) >= 0) n++;
+  }
+  return n;
+}
+function renderNav() {
+  var h = '<div class="brand"><b>KOMPLEX</b><span>GYM &middot; REGISTRO</span></div>';
+  h += '<div class="navsearch"><input id="navq" placeholder="Buscar en todo..." value="' + esc(navq) + '"></div>';
+  var grupos = [['busq', 'Búsqueda'], ['inv', 'Inventario'], ['gen', 'General']], g, i, p;
+  for (g = 0; g < grupos.length; g++) {
+    h += '<div class="navgroup">' + grupos[g][1] + '</div>';
+    for (i = 0; i < D.paginas.length; i++) {
+      p = D.paginas[i];
+      if (p.grupo !== grupos[g][0]) continue;
+      if (!coincide(p, navq)) continue;
+      h += '<div class="navitem' + (i === cur ? ' on' : '') + '" data-a="ir" data-i="' + i + '">' +
+        esc(p.nombre) + (p.tipo === 'buscador' ? '' : '<span class="n">' + cuenta(p, navq) + '</span>') + '</div>';
+    }
+    if (grupos[g][0] === 'inv') {
+      h += '<div class="navadd" data-a="nuevapag">+ Añadir área</div>';
+    }
+  }
+  $('nav').innerHTML = h;
+}
+
+/* ---------------- PAGINA ---------------- */
+function renderPage() {
+  var p = pag(), h = '', i;
+  if (p.tipo === 'buscador') {
+    h += '<h1 class="title">' + esc(p.nombre) + '</h1>';
+    h += '<div class="sub"><b>BÚSQUEDA</b> &middot; SELECCIONE Y OBTENGA LA LISTA</div>';
+    h += renderBuscador();
+    $('page').innerHTML = h;
+    return;
+  }
+  h += '<h1 class="title">' + (edit
+    ? '<input data-f="titulo" value="' + esc(p.nombre) + '">' : esc(p.nombre)) + '</h1>';
+  h += '<div class="sub">' + (p.grupo === 'inv' ? 'INVENTARIO &middot; <b>ÁREA</b>' : '<b>SECCIÓN GENERAL</b>') +
+    ' &middot; ' + p.filas.length + ' registros</div>';
+
+  for (i = 0; i < p.bloques.length; i++) { h += renderBloque(p.bloques[i], i); }
+  if (edit) {
+    h += '<button class="btn red" data-a="addbloque">+ Añadir bloque de texto</button>';
+  } else if (!p.bloques.length) {
+    h += '<div class="vacio">Sin texto todavía. Active el <b>Modo edición</b> para escribir e insertar imágenes.</div>';
+  }
+
+  h += '<div class="tablabox" id="tablabox">' + renderTabla() + '</div>';
+  $('page').innerHTML = h;
+  crecer();
+}
+
+function crecer(uno) {
+  var ta = uno ? [uno] : $('page').getElementsByTagName('textarea'), k;
+  for (k = 0; k < ta.length; k++) {
+    ta[k].style.height = 'auto';
+    ta[k].style.height = (ta[k].scrollHeight + 6) + 'px';
+  }
+}
+
+function renderBuscador() {
+  var areas = [], cats = [], vistos = {}, i, k, p, v;
+  for (i = 0; i < D.paginas.length; i++) {
+    p = D.paginas[i];
+    if (p.grupo !== 'inv') continue;
+    areas.push(p.nombre);
+    for (k = 0; k < p.filas.length; k++) {
+      v = p.filas[k][1];
+      if (v && !vistos[v]) { vistos[v] = 1; cats.push(v); }
+    }
+  }
+  cats.sort();
+  var h = '<div class="filtros">';
+  h += '<label>\u00c1rea' + opciones('bq:area', areas, bq.area, 'Todas las \u00e1reas') + '</label>';
+  h += '<label>Categor\u00eda' + opciones('bq:cat', cats, bq.cat, 'Todas las categor\u00edas') + '</label>';
+  h += '<label>Estado' + opciones('bq:est', ['A', 'B', 'C', 'D'], bq.est, 'Todos los estados') + '</label>';
+  h += '<label>Contiene la palabra<input data-f="bq:txt" value="' + esc(bq.txt) + '" placeholder="\u00edtem, observaci\u00f3n..."></label>';
+  h += '<button class="btn" data-a="limpiar">Limpiar</button>';
+  h += '</div>';
+  h += '<div id="resultados">' + renderResultados() + '</div>';
+  return h;
+}
+
+function opciones(campo, lista, sel, todos) {
+  var h = '<select data-f="' + campo + '"><option value="">' + todos + '</option>', i;
+  for (i = 0; i < lista.length; i++) {
+    h += '<option value="' + esc(lista[i]) + '"' + (sel === lista[i] ? ' selected' : '') + '>' +
+      esc(lista[i]) + '</option>';
+  }
+  return h + '</select>';
+}
+
+function renderResultados() {
+  var res = [], i, k, p, f, txt = bq.txt.toLowerCase();
+  for (i = 0; i < D.paginas.length; i++) {
+    p = D.paginas[i];
+    if (p.grupo !== 'inv') continue;
+    if (bq.area && p.nombre !== bq.area) continue;
+    for (k = 0; k < p.filas.length; k++) {
+      f = p.filas[k];
+      if (bq.cat && f[1] !== bq.cat) continue;
+      if (bq.est && String(f[4]).toUpperCase().charAt(0) !== bq.est) continue;
+      if (txt && f.join(' ').toLowerCase().indexOf(txt) < 0) continue;
+      res.push([i, p.nombre, f]);
+    }
+  }
+  var h = '<div class="resumen">Resultado: <b class="cnt">' + res.length + '</b> \u00edtems</div>';
+  if (!res.length) {
+    return h + '<div class="vacio">Ning\u00fan \u00edtem coincide con la selecci\u00f3n.</div>';
+  }
+  h += '<div class="tablabox"><table><tr><th>\u00c1rea</th><th>Categor\u00eda</th>' +
+    '<th>\u00cdtem / Elemento</th><th>Cantidad</th><th>Estado</th><th>Observaci\u00f3n</th></tr>';
+  for (i = 0; i < res.length; i++) {
+    f = res[i][2];
+    h += '<tr><td><span class="irarea" data-a="irarea" data-i="' + res[i][0] + '">' + esc(res[i][1]) + '</span></td>';
+    h += '<td>' + esc(f[1]) + '</td><td>' + esc(f[2]) + '</td><td>' + esc(f[3]) + '</td>';
+    h += '<td>' + (f[4] ? '<span class="badge e-' + esc(String(f[4]).toUpperCase().charAt(0)) + '">' +
+      esc(f[4]) + '</span>' : '') + '</td>';
+    h += '<td>' + esc(f[5]) + '</td></tr>';
+  }
+  return h + '</table></div>';
+}
+
+function renderBloque(b, i) {
+  var h = '<div class="bloque">';
+  h += '<h3>' + (edit ? '<input data-f="bt:' + i + '" value="' + esc(b.t) + '" placeholder="Título del bloque">'
+    : esc(b.t)) + '</h3>';
+  if (edit) {
+    h += '<textarea data-f="bx:' + i + '" placeholder="Escriba aquí la información...">' + esc(b.txt) + '</textarea>';
+  } else {
+    var partes = String(b.txt).split(/\n\s*\n/), k;
+    for (k = 0; k < partes.length; k++) {
+      if (partes[k].replace(/\s/g, '')) { h += '<p>' + esc(partes[k]) + '</p>'; }
+    }
+  }
+  h += '<div class="imgs">';
+  var j;
+  for (j = 0; j < b.imgs.length; j++) {
+    h += '<div class="thumb"><img src="' + b.imgs[j].src + '" data-a="zoom" data-i="' + i + '" data-j="' + j + '">';
+    h += '<div class="pie">' + (edit
+      ? '<input data-f="pie:' + i + ':' + j + '" value="' + esc(b.imgs[j].pie) + '" placeholder="Descripción">'
+      : esc(b.imgs[j].pie)) + '</div>';
+    if (edit) {
+      h += '<span class="del" data-a="delimg" data-i="' + i + '" data-j="' + j + '">quitar imagen</span>';
+    }
+    h += '</div>';
+  }
+  h += '</div>';
+  if (edit) {
+    h += '<div class="bloquebar">';
+    h += '<button class="btn" data-a="addimg" data-i="' + i + '">Insertar imagen</button>';
+    h += '<button class="btn" data-a="up" data-i="' + i + '">Subir</button>';
+    h += '<button class="btn" data-a="down" data-i="' + i + '">Bajar</button>';
+    h += '<button class="btn" data-a="delbloque" data-i="' + i + '">Eliminar bloque</button>';
+    h += '</div>';
+  }
+  return h + '</div>';
+}
+
+function renderTabla() {
+  var p = pag(), h = '', i, j, q = filtro.toLowerCase();
+  h += '<div class="tablahead"><h2>' + esc(p.tabla || 'Registros') + '</h2><span class="right">';
+  h += '<input class="filtro" data-f="filtro" value="' + esc(filtro) + '" placeholder="Filtrar en la tabla...">';
+  h += '</span></div>';
+
+  if (p.grupo === 'inv') {
+    var c = { A: 0, B: 0, C: 0, D: 0 }, tot = 0, le;
+    for (i = 0; i < p.filas.length; i++) {
+      le = String(p.filas[i][4]).toUpperCase().charAt(0);
+      if (c[le] !== undefined) { c[le]++; tot++; }
+    }
+    if (tot) {
+      h += '<div class="resumen">Estado: <b>' + c.A + '</b> en A &middot; <b>' + c.B +
+        '</b> en B &middot; <b>' + c.C + '</b> en C &middot; <b>' + c.D + '</b> en D</div>';
+    }
+  }
+
+  var salta = (p.agrupa && !edit) ? 1 : 0;
+  h += '<table><tr>';
+  for (j = salta; j < p.cols.length; j++) { h += '<th>' + esc(p.cols[j]) + '</th>'; }
+  if (edit) { h += '<th style="width:22px"></th>'; }
+  h += '</tr>';
+
+  var vistos = 0, grupo = null, f, v;
+  for (i = 0; i < p.filas.length; i++) {
+    f = p.filas[i];
+    if (q && f.join(' ').toLowerCase().indexOf(q) < 0) continue;
+    vistos++;
+    if (p.agrupa && !edit && f[0] !== grupo) {
+      grupo = f[0];
+      h += '<tr class="grupo"><td colspan="' + (p.cols.length - salta) + '">' + esc(grupo) + '</td></tr>';
+    }
+    h += '<tr>';
+    for (j = salta; j < p.cols.length; j++) {
+      v = f[j] == null ? '' : f[j];
+      if (edit) {
+        h += '<td><input data-f="cel:' + i + ':' + j + '" value="' + esc(v) + '"></td>';
+      } else if (p.grupo === 'inv' && j === 4 && v) {
+        h += '<td><span class="badge e-' + esc(String(v).toUpperCase().charAt(0)) + '">' + esc(v) + '</span></td>';
+      } else {
+        h += '<td>' + esc(v) + '</td>';
+      }
+    }
+    if (edit) { h += '<td><span class="delrow" data-a="delfila" data-i="' + i + '">&times;</span></td>'; }
+    h += '</tr>';
+  }
+  h += '</table>';
+  if (!vistos) {
+    h += '<div class="vacio">' + (filtro ? 'Nada coincide con el filtro.' : 'Tabla vacía. Active el Modo edición para añadir filas.') + '</div>';
+  }
+  if (edit) {
+    h += '<div style="margin-top:10px">';
+    h += '<button class="btn red" data-a="addfila">+ Añadir fila</button>';
+    if (p.grupo === 'inv') {
+      h += '<button class="btn" data-a="delpag" style="float:right">Eliminar esta área</button>';
+    }
+    h += '</div>';
+  }
+  if (p.grupo === 'inv') {
+    h += '<div class="leyenda">Escala de estado:' +
+      '<span class="badge e-A">A</span> bueno<span class="badge e-B">B</span> deterioro leve' +
+      '<span class="badge e-C">C</span> deterioro<span class="badge e-D">D</span> no funcional</div>';
+  }
+  return h;
+}
+
+function render() { renderNav(); renderPage(); }
+function renderSoloTabla() { $('tablabox').innerHTML = renderTabla(); }
+
+/* ---------------- EVENTOS ---------------- */
+function onInput(ev) {
+  var t = ev.target || ev.srcElement;
+  if (t.id === 'navq') {
+    navq = t.value;
+    renderNav();
+    var b = $('navq');
+    if (b) { b.focus(); b.value = navq; }
+    return;
+  }
+  var f = t.getAttribute ? t.getAttribute('data-f') : null;
+  if (!f) return;
+  var a = f.split(':'), p = pag();
+  if (a[0] === 'titulo') { p.nombre = t.value; renderNav(); }
+  else if (a[0] === 'bt') { p.bloques[+a[1]].t = t.value; }
+  else if (a[0] === 'bx') { p.bloques[+a[1]].txt = t.value; crecer(t); }
+  else if (a[0] === 'pie') { p.bloques[+a[1]].imgs[+a[2]].pie = t.value; }
+  else if (a[0] === 'cel') { p.filas[+a[1]][+a[2]] = t.value; }
+  else if (a[0] === 'bq') {
+    bq[a[1]] = t.value;
+    $('resultados').innerHTML = renderResultados();
+    return;
+  }
+  else if (a[0] === 'filtro') {
+    filtro = t.value;
+    renderSoloTabla();
+    var x = $('tablabox').getElementsByTagName('input')[0];
+    if (x) { x.focus(); x.value = filtro; }
+    return;
+  } else { return; }
+  tocar();
+}
+
+function onClick(ev) {
+  var t = ev.target || ev.srcElement, a = null, i, j;
+  while (t && t !== document.body) {
+    a = t.getAttribute ? t.getAttribute('data-a') : null;
+    if (a) break;
+    t = t.parentNode;
+  }
+  if (!a) return;
+  i = parseInt(t.getAttribute('data-i'), 10);
+  j = parseInt(t.getAttribute('data-j'), 10);
+  var p = pag();
+
+  if (a === 'ir') {
+    cur = i; filtro = navq; render(); window.scrollTo(0, 0);
+  } else if (a === 'irarea') {
+    cur = i; filtro = bq.txt; render(); window.scrollTo(0, 0);
+  } else if (a === 'limpiar') {
+    bq = { area: '', cat: '', est: '', txt: '' }; renderPage();
+  } else if (a === 'nuevapag') {
+    var n = prompt('Nombre de la nueva área:');
+    if (!n) return;
+    var pos = contarInv();
+    D.paginas.splice(pos, 0, {
+      nombre: n, grupo: 'inv', agrupa: true, tabla: 'Inventario del área',
+      cols: ['Nivel', 'Categoría', 'Ítem / Elemento', 'Cantidad', 'Estado', 'Observación'],
+      bloques: [], filas: []
+    });
+    cur = pos; guardar(); render();
+  } else if (a === 'delpag') {
+    if (!confirm('¿Eliminar el área "' + p.nombre + '" con todo su contenido?')) return;
+    D.paginas.splice(cur, 1); cur = 0; guardar(); render();
+  } else if (a === 'addbloque') {
+    p.bloques.push({ t: 'Nuevo bloque', txt: '', imgs: [] }); guardar(); renderPage();
+  } else if (a === 'delbloque') {
+    if (confirm('¿Eliminar este bloque de texto?')) { p.bloques.splice(i, 1); guardar(); renderPage(); }
+  } else if (a === 'up' && i > 0) {
+    mover(p.bloques, i, i - 1); guardar(); renderPage();
+  } else if (a === 'down' && i < p.bloques.length - 1) {
+    mover(p.bloques, i, i + 1); guardar(); renderPage();
+  } else if (a === 'addimg') {
+    pendiente = i; $('fileImg').value = ''; $('fileImg').click();
+  } else if (a === 'delimg') {
+    if (confirm('¿Quitar esta imagen?')) { p.bloques[i].imgs.splice(j, 1); guardar(); renderPage(); }
+  } else if (a === 'zoom') {
+    $('lightimg').src = p.bloques[i].imgs[j].src;
+    $('lightbox').style.display = 'block';
+  } else if (a === 'addfila') {
+    var nueva = [], k, ult = p.filas.length ? p.filas[p.filas.length - 1][0] : '';
+    for (k = 0; k < p.cols.length; k++) { nueva.push(k === 0 && p.agrupa ? ult : ''); }
+    p.filas.push(nueva); guardar(); renderSoloTabla();
+  } else if (a === 'delfila') {
+    if (confirm('¿Eliminar esta fila?')) { p.filas.splice(i, 1); guardar(); renderSoloTabla(); }
+  }
+}
+function mover(arr, a, b) { var x = arr[a]; arr[a] = arr[b]; arr[b] = x; }
+function contarInv() {
+  var n = 0, i;
+  for (i = 0; i < D.paginas.length; i++) { if (D.paginas[i].grupo === 'inv') n++; }
+  return n;
+}
+
+/* ---------------- IMAGENES ---------------- */
+function procesarImagen(file, cb) {
+  var fr = new FileReader();
+  fr.onload = function () {
+    var img = new Image();
+    img.onload = function () {
+      var max = 1280, w = img.width, h = img.height, s;
+      if (w > max || h > max) {
+        s = Math.min(max / w, max / h);
+        w = Math.round(w * s); h = Math.round(h * s);
+      }
+      var c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      var x = c.getContext('2d');
+      x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);
+      x.drawImage(img, 0, 0, w, h);
+      var out;
+      try { out = c.toDataURL('image/jpeg', 0.75); } catch (e) { out = fr.result; }
+      cb(out);
+    };
+    img.onerror = function () { cb(fr.result); };
+    img.src = fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+
+/* ---------------- RESPALDO ---------------- */
+function exportar() {
+  var txt = JSON.stringify(D), nom = 'Komplex-respaldo.json';
+  try {
+    var blob = new Blob([txt], { type: 'application/json' });
+    if (navigator.msSaveBlob) { navigator.msSaveBlob(blob, nom); return; }
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nom;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  } catch (e) {
+    var w = window.open('', '_blank');
+    w.document.write('<pre>' + esc(txt) + '</pre>');
+  }
+}
+function importar(file) {
+  var fr = new FileReader();
+  fr.onload = function () {
+    var n;
+    try { n = JSON.parse(fr.result); } catch (e) { alert('El archivo no es un respaldo válido.'); return; }
+    if (!n.paginas) { alert('El archivo no es un respaldo válido.'); return; }
+    if (!confirm('¿Continuar? Esto reemplaza TODA la información actual.')) return;
+    D = n; cur = 0; guardar(); render();
+  };
+  fr.readAsText(file);
+}
+
+/* ---------------- ARRANQUE ---------------- */
+cargar();
+render();
+aviso(tam() + ' MB usados');
+
+$('page').onclick = onClick;
+$('nav').onclick = onClick;
+$('page').oninput = onInput;
+$('nav').oninput = onInput;
+$('page').onchange = onInput;
+$('nav').onchange = onInput;
+
+$('bEdit').onclick = function () {
+  edit = !edit;
+  this.innerHTML = edit ? 'Terminar edición' : 'Modo edición';
+  this.className = edit ? 'btn' : 'btn red';
+  renderPage();
+};
+$('bExport').onclick = exportar;
+$('bImport').onclick = function () { $('fileJson').value = ''; $('fileJson').click(); };
+$('bPrint').onclick = function () { window.print(); };
+$('lightbox').onclick = function () { this.style.display = 'none'; };
+$('fileImg').onchange = function () {
+  if (!this.files || !this.files[0] || pendiente < 0) return;
+  aviso('Procesando imagen...');
+  procesarImagen(this.files[0], function (src) {
+    pag().bloques[pendiente].imgs.push({ src: src, pie: '' });
+    pendiente = -1;
+    guardar();
+    renderPage();
+  });
+};
+$('fileJson').onchange = function () { if (this.files && this.files[0]) importar(this.files[0]); };
+document.onkeydown = function (e) { if (e.keyCode === 27) { $('lightbox').style.display = 'none'; } };
+</script>
+</body>
+</html>
